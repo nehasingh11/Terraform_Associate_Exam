@@ -4,6 +4,16 @@ variable "resource_group_location" {
   description = "Location of the resource group."
 }
 
+variable "ssh-ports" {
+  type = map(string)
+  default = {
+    "80" : "100",
+    "443" : "120",
+    "22" : "140",
+  }
+
+}
+
 variable "resource_group_name_prefix" {
   type        = string
   default     = "rg"

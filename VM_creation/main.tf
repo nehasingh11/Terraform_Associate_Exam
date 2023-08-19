@@ -34,17 +34,22 @@ resource "azurerm_network_security_group" "my_terraform_nsg" {
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
-  security_rule {
-    name                       = "SSH"
-    priority                   = 1001
-    direction                  = "Inbound"
-    access                     = "Allow"
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    destination_port_range     = "22"
-    source_address_prefix      = "*"
-    destination_address_prefix = "*"
+  dynamic "security_rule" {
+    for_each = var.ssh-ports
+    content {
+      name                       = "ssh-rule-port-${security_rule.key}"
+      priority                   = security_rule.value
+      direction                  = "Inbound"
+      access                     = "Allow"
+      protocol                   = "Tcp"
+      source_port_range          = "*"
+      destination_port_range     = security_rule.key
+      source_address_prefix      = "*"
+      destination_address_prefix = "*"
+    }
+
   }
+
 }
 
 resource "azurerm_network_interface" "my_terraform_nic" {
@@ -76,6 +81,7 @@ resource "random_id" "random_id" {
   byte_length = 8
 }
 
+/*
 resource "azurerm_storage_account" "my_storage_account" {
   name                     = "diag${random_id.random_id.hex}"
   location                 = azurerm_resource_group.rg.location
@@ -83,6 +89,7 @@ resource "azurerm_storage_account" "my_storage_account" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
+*/
 
 resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
   name                  = "myVM"
@@ -94,13 +101,13 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
   os_disk {
     name                 = "myOsDisk"
     caching              = "ReadWrite"
-    storage_account_type = "Premium_LRS"
+    storage_account_type = "Standard_LRS"
   }
 
   source_image_reference {
-    publisher = "Canonical"
-    offer     = "0001-com-ubuntu-server-jammy"
-    sku       = "22_04-lts-gen2"
+    publisher = "RedHat"
+    offer     = "RHEL"
+    sku       = "92-gen2"
     version   = "latest"
   }
 
@@ -112,7 +119,14 @@ resource "azurerm_linux_virtual_machine" "my_terraform_vm" {
     public_key = jsondecode(azapi_resource_action.ssh_public_key_gen.output).publicKey
   }
 
+
+
+
+  #custom_data = filebase64("${path.module}/app-scripts/redhat_webvm_script.sh")
+
+  /*
   boot_diagnostics {
     storage_account_uri = azurerm_storage_account.my_storage_account.primary_blob_endpoint
   }
+  */
 }
