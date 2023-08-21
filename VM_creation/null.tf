@@ -12,6 +12,17 @@ resource "null_resource" "nl" {
     inline = [
       "sudo mkdir /tmp/test",
       "sudo rm -rf /tmp/test",
+      "sudo yum install -y git",
+      "sudo git clone https://github.com/nehasingh11/Linux_web_app_script.git /tmp/test",
+      "sudo bash /tmp/test/app-script.sh",
+    ]
+  }
+}
+
+/*
+
+"sudo mkdir /tmp/test",
+      "sudo rm -rf /tmp/test",
 
       "function check_git_version () {",
       "git --version 2> /dev/null 1> a.txt",
@@ -31,6 +42,6 @@ resource "null_resource" "nl" {
 
       "sudo git clone https://github.com/nehasingh11/Linux_web_app_script.git /tmp/test",
       "sudo bash /tmp/test/app-script.sh",
-    ]
-  }
-}
+
+
+*/
