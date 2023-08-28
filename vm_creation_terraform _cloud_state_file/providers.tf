@@ -1,4 +1,13 @@
 terraform {
+
+  cloud {
+    organization = "my-org-neha"    # set the env variable in terraform cloud 
+                                    # ARM_CLIENT_ID, ARM_CLIENT_SECRET, ARM_SUBSCRIPTION_ID, ARM_TENANT_ID
+    workspaces {
+      name = "Devops-azure-app1"
+    }
+  }
+
   required_version = ">=0.12"
 
   required_providers {
